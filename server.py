@@ -1,10 +1,23 @@
 from mcp.server.fastmcp import FastMCP
-
-# Create an MCP server
+import requests
+from typing import Dict, Any
 mcp = FastMCP("Demo1")
 
 
-# Add an addition tool
+@mcp.resource("vectors://{query_embedding}")
+def get_vector_data(query_embedding: str) -> Dict[str, Any]:
+    """Retrieve vector database results for a given embedding"""
+    rag_api_url = "http://localhost:5000/embed"
+
+    try:
+        response = requests.post(rag_api_url, json={"texts": [query_embedding]})
+        response.raise_for_status()  # Raise an error for HTTP errors (4xx, 5xx)
+        return response.json()  # Directly return the parsed JSON response
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e)}
+
+   
+
 @mcp.tool()
 def add(a: int, b: int) -> int:
     """Add two numbers"""
@@ -13,9 +26,3 @@ def add(a: int, b: int) -> int:
 def sub(a: int, b: int) -> int:
     """sub two numbers"""
     return a - b
-
-# Add a dynamic greeting resource
-@mcp.resource("greeting://{name}")
-def get_greeting(name: str) -> str:
-    """Get a personalized greeting"""
-    return f"Hello, {name}!"
