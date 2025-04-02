@@ -9,7 +9,10 @@ mcp = FastMCP("Demo1")
 def add(a: int, b: int) -> int:
     """Add two numbers"""
     return a + b
-
+@mcp.tool()
+def sub(a: int, b: int) -> int:
+    """sub two numbers"""
+    return a - b
 
 # Add a dynamic greeting resource
 @mcp.resource("greeting://{name}")
